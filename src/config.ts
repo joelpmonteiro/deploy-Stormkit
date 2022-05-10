@@ -1,7 +1,8 @@
-const cors = require("cors")
-const express = require("express")
+import cors from "cors";
+import express, { Request, Response, NextFunction, ErrorRequestHandler } from "express";
+import routers from "./router"
+
 const app = express()
-const routes = require('./router.js')
 const corOP = {
     origin: true,
     credentials: true,
@@ -10,12 +11,19 @@ const corOP = {
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
 }
 
+app.use(express.json())
+app.use(
+    express.urlencoded({
+        extended: true,
+    })
+)
+
 //Active Cors
 app.use(cors(corOP))
-app.options("*", cors(corOP))
+app.options("*", cors<Request>(corOP))
 
 //Enable CORS for all HTTP methods
-app.use((err, req, res, next) => {
+app.use((req: Request, res: Response, next: NextFunction) => {
     res.header("Access-Control-Allow-Origin", "*")
     res.header(
         "Access-Control-Allow-Headers",
@@ -29,12 +37,7 @@ app.use((err, req, res, next) => {
     next()
 })
 
-app.use(express.json())
-app.use(
-    express.urlencoded({
-        extended: true,
-    })
-)
 
-app.use('/', routes)
-module.exports = { app }
+
+app.use('/', routers)
+export default app
